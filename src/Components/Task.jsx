@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Container, Form, InputGroup, Row, Table, Button } from 'react-bootstrap';
+import { Col, Container, Form, Row, Table, Button } from 'react-bootstrap';
 import Data from '../Data.json';
 
 export default class Task extends Component {
@@ -18,20 +18,44 @@ export default class Task extends Component {
         this.setState({ [key]: value });
     }
 
-    handlesubmitBtn() {
-        var newid = Math.max.apply(Math, this.state.data.map(function (o) { return o.id; })) + 1;
-        console.log(newid);
-        this.state.data.push({
-            id: newid,
-            title: this.state.title,
-            description: this.state.description,
-        });
+    handleSubmitBtn() {
+        if(this.state.id ===  0){
+            var newid = Math.max.apply(Math, this.state.data.map(function (o) { return o.id; })) + 1;
+            console.log(newid);
+            this.state.data.push({
+                id: newid,
+                title: this.state.title,
+                description: this.state.description,
+            });
+        } else {
+            var task = this.state.data.find(x=>x.id === this.state.id);
+            if(task){
+                task.title = this.state.title
+                task.description = this.state.description
+            }
+        }
         this.setState({
             //message : "Added Successfully", 
             id: 0,
             title: "",
             description: "",
         });
+    }
+
+    handleDeleteBtn(id) {
+        var data = this.state.data.filter(z=>z.id !== id);
+        this.setState({ data: data });
+    }
+
+    handleEditBtn(id){
+        var task = this.state.data.find(z=>z.id === id);
+        if(task){
+            this.setState({
+                id: id,
+                title: task.title,
+                description: task.description,
+            });
+        }
     }
 
     render() {
@@ -57,7 +81,7 @@ export default class Task extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Button variant="primary" className="float-right col-4" onClick={() => this.handlesubmitBtn()} type="button">
+                            <Button variant="primary" className="float-right col-4" onClick={() => this.handleSubmitBtn()} type="button">
                                 Submit
                             </Button>
                         </Row>
@@ -68,6 +92,7 @@ export default class Task extends Component {
                                 <th>#</th>
                                 <th>Title</th>
                                 <th>Description</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,6 +101,14 @@ export default class Task extends Component {
                                     <td>{item.id}</td>
                                     <td>{item.title}</td>
                                     <td>{item.description}</td>
+                                    <td>
+                                        <Button variant="primary" className="m-1" onClick={() => this.handleEditBtn(item.id)} type="button">
+                                            Edit
+                                        </Button>
+                                        <Button variant="primary" className="m-1" onClick={() => this.handleDeleteBtn(item.id)} type="button">
+                                            Delete
+                                        </Button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
